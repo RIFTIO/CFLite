@@ -152,7 +152,14 @@ CF_INLINE size_t malloc_size(void *memblock) {
     return malloc_usable_size(memblock);
 }
 
-#endif
+#include <time.h>
+CF_INLINE uint64_t mach_absolute_time() {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (uint64_t)ts.tv_nsec + (uint64_t)ts.tv_sec * 1000000000ull;
+}
+
+#endif  // DEPLOYMENT_TARGET_LINUX
 
 #if DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX    
 #if !defined(MIN)
