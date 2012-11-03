@@ -1134,6 +1134,10 @@ bool OSAtomicCompareAndSwap32Barrier(int32_t oldValue, int32_t newValue, volatil
     return __sync_bool_compare_and_swap(theValue, oldValue, newValue);
 }
 
+bool OSAtomicCompareAndSwap64Barrier(int64_t oldValue, int64_t newValue, volatile int64_t *theValue) {
+    return __sync_bool_compare_and_swap(theValue, oldValue, newValue);
+}
+
 int32_t OSAtomicDecrement32Barrier(volatile int32_t *dst)
 {
     return OSAtomicAdd32Barrier(-1, dst);

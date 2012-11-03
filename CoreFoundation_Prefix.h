@@ -142,6 +142,8 @@ int32_t OSAtomicDecrement32(volatile int32_t *theValue);
 int32_t OSAtomicAdd32( int32_t theAmount, volatile int32_t *theValue );
 int32_t OSAtomicAdd32Barrier( int32_t theAmount, volatile int32_t *theValue );
 bool OSAtomicCompareAndSwap32Barrier( int32_t oldValue, int32_t newValue, volatile int32_t *theValue );
+bool OSAtomicCompareAndSwap64Barrier( int64_t oldValue, int64_t newValue, volatile int64_t *theValue );
+
     
 void OSMemoryBarrier();
 
