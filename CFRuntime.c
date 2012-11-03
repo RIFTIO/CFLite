@@ -1079,10 +1079,6 @@ void __CFInitialize(void) {
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
         __CFTimeZoneInitialize();
         __CFCalendarInitialize();
-#if DEPLOYMENT_TARGET_LINUX
-        __CFTimeZoneInitialize();
-        __CFCalendarInitialize();
-#endif
 #endif
 
         {
