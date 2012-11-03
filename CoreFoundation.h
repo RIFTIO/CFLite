@@ -76,6 +76,7 @@
 #include <CoreFoundation/CFNumberFormatter.h>
 #include <CoreFoundation/CFPreferences.h>
 #include <CoreFoundation/CFPropertyList.h>
+#include <CoreFoundation/CFRunLoop.h>
 #include <CoreFoundation/CFSet.h>
 #include <CoreFoundation/CFString.h>
 #include <CoreFoundation/CFStringEncodingExt.h>
@@ -84,13 +85,11 @@
 #include <CoreFoundation/CFURL.h>
 #include <CoreFoundation/CFURLAccess.h>
 #include <CoreFoundation/CFUUID.h>
-#include <CoreFoundation/CFUtilities.h>
 
 #if (TARGET_OS_MAC && !(TARGET_OS_EMBEDDED || TARGET_OS_IPHONE)) || (TARGET_OS_EMBEDDED || TARGET_OS_IPHONE) || TARGET_OS_WIN32
 #include <CoreFoundation/CFBundle.h>
 #include <CoreFoundation/CFMessagePort.h>
 #include <CoreFoundation/CFPlugIn.h>
-#include <CoreFoundation/CFRunLoop.h>
 #include <CoreFoundation/CFStream.h>
 #include <CoreFoundation/CFSocket.h>
 
