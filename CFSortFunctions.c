@@ -28,7 +28,7 @@
 
 #include <CoreFoundation/CFBase.h>
 #include "CFInternal.h"
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
 #include <dispatch/dispatch.h>
 #endif
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
@@ -133,8 +133,7 @@ static void __CFSimpleMergeSort(VALUE_TYPE listp[], INDEX_TYPE cnt, VALUE_TYPE t
     }
 }
 
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS
-// Excluded from linux for dispatch dependency
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
 
 // if !right, put the cnt1 smallest values in tmp, else put the cnt2 largest values in tmp
 static void __CFSortIndexesNMerge(VALUE_TYPE listp1[], INDEX_TYPE cnt1, VALUE_TYPE listp2[], INDEX_TYPE cnt2, VALUE_TYPE tmp[], size_t right, COMPARATOR_BLOCK cmp) {
@@ -271,7 +270,7 @@ void CFSortIndexes(CFIndex *indexBuffer, CFIndex count, CFOptionFlags opts, CFCo
             ncores = 16;
         }
     }
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
     if (count <= 65536) {
         for (CFIndex idx = 0; idx < count; idx++) indexBuffer[idx] = idx;
     } else {
@@ -285,7 +284,7 @@ void CFSortIndexes(CFIndex *indexBuffer, CFIndex count, CFOptionFlags opts, CFCo
 #else
     for (CFIndex idx = 0; idx < count; idx++) indexBuffer[idx] = idx;
 #endif
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
     if (opts & kCFSortConcurrent) {
         __CFSortIndexesN(indexBuffer, count, ncores, cmp); // naturally stable
         return;

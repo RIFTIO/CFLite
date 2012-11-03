@@ -94,11 +94,8 @@
 #include <CoreFoundation/CFStream.h>
 #include <CoreFoundation/CFSocket.h>
 
-
 #endif
 
-#if (TARGET_OS_MAC && !(TARGET_OS_EMBEDDED || TARGET_OS_IPHONE)) || (TARGET_OS_EMBEDDED || TARGET_OS_IPHONE)
-#endif
 
 #if (TARGET_OS_MAC && !(TARGET_OS_EMBEDDED || TARGET_OS_IPHONE))
 #include <CoreFoundation/CFUserNotification.h>

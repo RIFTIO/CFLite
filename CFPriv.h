@@ -518,8 +518,10 @@ typedef CF_OPTIONS(CFOptionFlags, _CFBundleFilteredPlistOptions) {
     _CFBundleFilteredPlistMemoryMapped = 1
 } CF_ENUM_AVAILABLE(10_8, 6_0);
 
+#ifndef TARGET_OS_LINUX
 CF_EXPORT CFPropertyListRef _CFBundleCreateFilteredInfoPlist(CFBundleRef bundle, CFSetRef keyPaths, _CFBundleFilteredPlistOptions options) CF_AVAILABLE(10_8, 6_0);
 CF_EXPORT CFPropertyListRef _CFBundleCreateFilteredLocalizedInfoPlist(CFBundleRef bundle, CFSetRef keyPaths, CFStringRef localizationName, _CFBundleFilteredPlistOptions options) CF_AVAILABLE(10_8, 6_0);
+#endif
 
 #if TARGET_OS_WIN32
 #include <CoreFoundation/CFNotificationCenter.h>
