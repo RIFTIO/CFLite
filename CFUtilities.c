@@ -435,6 +435,9 @@ __private_extern__ CFIndex __CFActiveProcessorCount() {
     if (result != 0) {
         pcnt = 0;
     }
+#elif DEPLOYMENT_TARGET_LINUX
+    int result = (int)sysconf(_SC_NPROCESSORS_ONLN);
+    pcnt = result < 0 ? 1 : result;
 #else
     // Assume the worst
     pcnt = 1;
