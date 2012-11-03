@@ -1091,6 +1091,9 @@ void __CFInitialize(void) {
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
             args = *_NSGetArgv();
             cnt = *_NSGetArgc();
+#elif DEPLOYMENT_TARGET_LINUX
+            args = _CFGetArgv();
+            cnt = _CFGetArgc();
 #elif DEPLOYMENT_TARGET_WINDOWS
             wchar_t *commandLine = GetCommandLineW();
             // result is actually pointer to wchar_t *, make sure to account for that below

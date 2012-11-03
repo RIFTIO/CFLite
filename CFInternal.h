@@ -109,6 +109,12 @@ CF_EXTERN_C_BEGIN
 
 #include <CoreFoundation/ForFoundationOnly.h>
 
+#if DEPLOYMENT_TARGET_LINUX
+__private_extern__ int _CFGetArgc(void);
+__private_extern__ char** _CFGetArgv(void);
+
+#endif
+
 CF_EXPORT const char *_CFProcessName(void);
 CF_EXPORT CFStringRef _CFProcessNameString(void);
 
