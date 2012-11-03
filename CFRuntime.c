@@ -1061,12 +1061,10 @@ void __CFInitialize(void) {
 #if DEPLOYMENT_TARGET_WINDOWS
         __CFWindowsNamedPipeInitialize();
 #endif
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_WINDOWS
         __CFRunLoopInitialize();
         __CFRunLoopObserverInitialize();
         __CFRunLoopSourceInitialize();
         __CFRunLoopTimerInitialize();
-#endif
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
         __CFTimeZoneInitialize();
         __CFCalendarInitialize();
