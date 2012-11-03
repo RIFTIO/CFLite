@@ -208,15 +208,6 @@ __private_extern__ uintptr_t __CFRuntimeObjCClassTable[__CFRuntimeClassTableSize
 bool (*__CFObjCIsCollectable)(void *) = NULL;
 #endif
 
-#if !__CONSTANT_CFSTRINGS__ || DEPLOYMENT_TARGET_EMBEDDED_MINI
-// Compiler uses this symbol name; must match compiler built-in decl, so we use 'int'
-#if __LP64__
-int __CFConstantStringClassReference[24] = {0};
-#else
-int __CFConstantStringClassReference[12] = {0};
-#endif
-#endif
-
 #if __LP64__
 int __CFConstantStringClassReference[24] = {0};
 #else
