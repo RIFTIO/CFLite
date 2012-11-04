@@ -824,10 +824,7 @@ __private_extern__ void __CFFinalizeWindowsThreadData();
 extern void __CFStreamInitialize(void);
 extern void __CFCalendarInitialize();
 extern void __CFTimeZoneInitialize();
-#if DEPLOYMENT_TARGET_LINUX
-extern void __CFCalendarInitialize();
-extern void __CFTimeZoneInitialize();
-#endif
+extern void __CFDateInitialize();
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS
 extern void __CFXPreferencesInitialize(void);
 #endif
@@ -1061,6 +1058,7 @@ void __CFInitialize(void) {
 #if DEPLOYMENT_TARGET_WINDOWS
         __CFWindowsNamedPipeInitialize();
 #endif
+        __CFDateInitialize();   // must occur before CFRunLoop, or __CFTimeIntervalToTSR() will fail.
         __CFRunLoopInitialize();
         __CFRunLoopObserverInitialize();
         __CFRunLoopSourceInitialize();
