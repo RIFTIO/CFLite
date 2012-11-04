@@ -73,6 +73,7 @@
 #include <Block.h>
 #endif
 #if DEPLOYMENT_TARGET_LINUX || DEPLOYMENT_TARGET_FREEBSD
+#include <sys/mman.h>
 #include <string.h>
 #include <pthread.h>
 #endif
@@ -434,6 +435,9 @@ __private_extern__ CFIndex __CFActiveProcessorCount() {
     if (result != 0) {
         pcnt = 0;
     }
+#elif DEPLOYMENT_TARGET_LINUX
+    int result = (int)sysconf(_SC_NPROCESSORS_ONLN);
+    pcnt = result < 0 ? 1 : result;
 #else
     // Assume the worst
     pcnt = 1;
@@ -585,7 +589,7 @@ static void __CFLogCString(int32_t lev, const char *message, size_t length, char
     char *time = NULL;
     char *thread = NULL;
     char *uid = NULL;
-#if DEPLOYMENT_TARGET_WINDOWS
+#if DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
     int bannerLen = 0;
 #endif
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
@@ -1067,7 +1071,7 @@ __private_extern__ Boolean _CFReadMappedFromFile(CFStringRef path, Boolean map, 
     if (0LL == statBuf.st_size) {
         bytes = malloc(8); // don't return constant string -- it's freed!
 	length = 0;
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
     } else if (map) {
         if((void *)-1 == (bytes = mmap(0, (size_t)statBuf.st_size, PROT_READ, MAP_PRIVATE, fd, 0))) {
 	    int32_t savederrno = errno;

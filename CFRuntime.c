@@ -208,15 +208,6 @@ __private_extern__ uintptr_t __CFRuntimeObjCClassTable[__CFRuntimeClassTableSize
 bool (*__CFObjCIsCollectable)(void *) = NULL;
 #endif
 
-#if !__CONSTANT_CFSTRINGS__ || DEPLOYMENT_TARGET_EMBEDDED_MINI
-// Compiler uses this symbol name; must match compiler built-in decl, so we use 'int'
-#if __LP64__
-int __CFConstantStringClassReference[24] = {0};
-#else
-int __CFConstantStringClassReference[12] = {0};
-#endif
-#endif
-
 #if __LP64__
 int __CFConstantStringClassReference[24] = {0};
 #else
@@ -1070,19 +1061,13 @@ void __CFInitialize(void) {
 #if DEPLOYMENT_TARGET_WINDOWS
         __CFWindowsNamedPipeInitialize();
 #endif
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_WINDOWS
         __CFRunLoopInitialize();
         __CFRunLoopObserverInitialize();
         __CFRunLoopSourceInitialize();
         __CFRunLoopTimerInitialize();
-#endif
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
         __CFTimeZoneInitialize();
         __CFCalendarInitialize();
-#if DEPLOYMENT_TARGET_LINUX
-        __CFTimeZoneInitialize();
-        __CFCalendarInitialize();
-#endif
 #endif
 
         {
@@ -1091,6 +1076,9 @@ void __CFInitialize(void) {
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
             args = *_NSGetArgv();
             cnt = *_NSGetArgc();
+#elif DEPLOYMENT_TARGET_LINUX
+            args = _CFGetArgv();
+            cnt = _CFGetArgc();
 #elif DEPLOYMENT_TARGET_WINDOWS
             wchar_t *commandLine = GetCommandLineW();
             // result is actually pointer to wchar_t *, make sure to account for that below

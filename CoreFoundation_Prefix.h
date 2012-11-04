@@ -142,6 +142,8 @@ int32_t OSAtomicDecrement32(volatile int32_t *theValue);
 int32_t OSAtomicAdd32( int32_t theAmount, volatile int32_t *theValue );
 int32_t OSAtomicAdd32Barrier( int32_t theAmount, volatile int32_t *theValue );
 bool OSAtomicCompareAndSwap32Barrier( int32_t oldValue, int32_t newValue, volatile int32_t *theValue );
+bool OSAtomicCompareAndSwap64Barrier( int64_t oldValue, int64_t newValue, volatile int64_t *theValue );
+
     
 void OSMemoryBarrier();
 
@@ -150,7 +152,14 @@ CF_INLINE size_t malloc_size(void *memblock) {
     return malloc_usable_size(memblock);
 }
 
-#endif
+#include <time.h>
+CF_INLINE uint64_t mach_absolute_time() {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (uint64_t)ts.tv_nsec + (uint64_t)ts.tv_sec * 1000000000ull;
+}
+
+#endif  // DEPLOYMENT_TARGET_LINUX
 
 #if DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX    
 #if !defined(MIN)

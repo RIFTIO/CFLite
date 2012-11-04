@@ -706,6 +706,10 @@ CF_EXPORT void CFStringNormalize(CFMutableStringRef theString, CFStringNormaliza
 CF_EXPORT
 void CFStringFold(CFMutableStringRef theString, CFOptionFlags theFlags, CFLocaleRef theLocale) CF_AVAILABLE(10_5, 2_0);
 
+
+#if 0
+// FIXME: Not implemented in CFLite
+
 /* Perform string transliteration.  The transformation represented by transform is applied to the given range of string, modifying it in place. Only the specified range will be modified, but the transform may look at portions of the string outside that range for context. NULL range pointer causes the whole string to be transformed. On return, range is modified to reflect the new range corresponding to the original range. reverse indicates that the inverse transform should be used instead, if it exists. If the transform is successful, true is returned; if unsuccessful, false. Reasons for the transform being unsuccessful include an invalid transform identifier, or attempting to reverse an irreversible transform.
 
 You can pass one of the predefined transforms below, or any valid ICU transform ID as defined in the ICU User Guide. Note that we do not support arbitrary set of ICU transform rules.
@@ -731,7 +735,7 @@ CF_EXPORT const CFStringRef kCFStringTransformLatinGreek;
 CF_EXPORT const CFStringRef kCFStringTransformToXMLHex;
 CF_EXPORT const CFStringRef kCFStringTransformToUnicodeName;
 CF_EXPORT const CFStringRef kCFStringTransformStripDiacritics CF_AVAILABLE(10_5, 2_0);
-
+#endif
 
 /*** General encoding related functionality ***/
 

@@ -48,6 +48,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <ctype.h>
+#include <dispatch/dispatch.h>
 
 #define PLIST_IX    0
 #define ARRAY_IX    1

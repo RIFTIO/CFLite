@@ -133,12 +133,12 @@
 #endif
 
 #if __has_feature(enumerator_attributes) && __has_attribute(availability)
-#define CF_ENUM_AVAILABLE(_mac, _ios) __OSX_AVAILABLE_STARTING(__MAC_##_mac, __IPHONE_##_ios)
-#define CF_ENUM_AVAILABLE_MAC(_mac) __OSX_AVAILABLE_STARTING(__MAC_##_mac, __IPHONE_NA)
-#define CF_ENUM_AVAILABLE_IOS(_ios) __OSX_AVAILABLE_STARTING(__MAC_NA, __IPHONE_##_ios)
-#define CF_ENUM_DEPRECATED(_macIntro, _macDep, _iosIntro, _iosDep) __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_##_macIntro, __MAC_##_macDep, __IPHONE_##_iosIntro, __IPHONE_##_iosDep)
-#define CF_ENUM_DEPRECATED_MAC(_macIntro, _macDep) __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_##_macIntro, __MAC_##_macDep, __IPHONE_NA, __IPHONE_NA)
-#define CF_ENUM_DEPRECATED_IOS(_iosIntro, _iosDep) __OSX_AVAILABLE_BUT_DEPRECATED(__MAC_NA, __MAC_NA, __IPHONE_##_iosIntro, __IPHONE_##_iosDep)
+#define CF_ENUM_AVAILABLE(_mac, _ios) CF_AVAILABLE(_mac, _ios)
+#define CF_ENUM_AVAILABLE_MAC(_mac) CF_AVAILABLE_MAC(_mac)
+#define CF_ENUM_AVAILABLE_IOS(_ios) CF_AVAILABLE_IOS(_ios)
+#define CF_ENUM_DEPRECATED(_macIntro, _macDep, _iosIntro, _iosDep) CF_DEPRECATED(_macIntro, _macDep, _iosIntro, _iosDep)
+#define CF_ENUM_DEPRECATED_MAC(_macIntro, _macDep) CF_DEPRECATED_MAC(_macIntro, _macDep)
+#define CF_ENUM_DEPRECATED_IOS(_iosIntro, _iosDep) CF_DEPRECATED_IOS(_iosIntro, _iosDep)
 #else
 #define CF_ENUM_AVAILABLE(_mac, _ios)
 #define CF_ENUM_AVAILABLE_MAC(_mac)

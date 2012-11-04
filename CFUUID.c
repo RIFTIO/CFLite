@@ -29,7 +29,7 @@
 #include <CoreFoundation/CFUUID.h>
 #include "CFInternal.h"
 
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_WINDOWS || DEPLOYMENT_TARGET_LINUX
 #include <dispatch/dispatch.h>
 
 static CFMutableDictionaryRef _uniquedUUIDs = NULL;
@@ -263,7 +263,7 @@ static CFUUIDRef __CFUUIDCreateWithBytesPrimitive(CFAllocatorRef allocator, CFUU
 
 #if DEPLOYMENT_TARGET_WINDOWS
 #include <Rpc.h>
-#elif DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
+#elif DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_LINUX
 #include <uuid/uuid.h>
 #endif
 
@@ -278,7 +278,7 @@ CFUUIDRef CFUUIDCreate(CFAllocatorRef alloc) {
         long rStatus = UuidCreate(&u);
         if (RPC_S_OK != rStatus && RPC_S_UUID_LOCAL_ONLY != rStatus) retval = 1;
         memmove(&bytes, &u, sizeof(bytes));
-#elif DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
+#elif DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_LINUX
         static Boolean useV1UUIDs = false, checked = false;
         uuid_t uuid;
         if (!checked) {
