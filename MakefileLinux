@@ -34,6 +34,7 @@ OBJECTS = 				\
 	CFPlatformConverters.o 	\
 	CFPreferences.o 		\
 	CFPropertyList.o 		\
+	CFRunLoop.o 			\
 	CFRuntime.o 			\
 	CFSet.o 				\
 	CFStorage.o 			\
@@ -80,6 +81,7 @@ PUBLIC_HEADERS= 			\
 	CFNumberFormatter.h 	\
 	CFPreferences.h 		\
 	CFPropertyList.h 		\
+	CFRunLoop.h 		\
 	CFSet.h 				\
 	CFString.h 				\
 	CFStringEncodingExt.h 	\
