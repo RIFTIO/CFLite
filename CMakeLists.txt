@@ -5,8 +5,17 @@ set (CFLiteVersion 744.12)
 set (CMAKE_VERBOSE_MAKEFILE YES)
 
 include("TestBigEndian")
+include("CheckFunctionExists")
 include("cmake/utilities.cmake")
 
+check_function_exists("strncat" "string.h" HAVE_STRLCAT)
+if (HAVE_STRLCAT)
+  add_definitions(-DHAVE_STRLCAT=1)
+endif ()
+check_function_exists("strncpy" "string.h" HAVE_STRLCPY)
+if (HAVE_STRLCPY)
+  add_definitions(-DHAVE_STRLCPY=1)
+endif ()
 
 if (NOT CMAKE_BUILD_TYPE)
   set (CMAKE_BUILD_TYPE Debug
