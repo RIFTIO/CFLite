@@ -79,6 +79,7 @@ set (cf_sources
   CoreFoundation/CFBinaryHeap.c
   CoreFoundation/CFBinaryPList.c
   CoreFoundation/CFBitVector.c
+  CoreFoundation/CFBuiltinConverters.c
   CoreFoundation/CFBurstTrie.c
   CoreFoundation/CFCalendar.c
   CoreFoundation/CFCharacterSet.c
@@ -102,10 +103,12 @@ set (cf_sources
   CoreFoundation/CFRunLoop.c
   CoreFoundation/CFRuntime.c
   CoreFoundation/CFSet.c
+  CoreFoundation/CFSortFunctions.c
   CoreFoundation/CFStorage.c
   CoreFoundation/CFString.c
   CoreFoundation/CFStringEncodingConverter.c
   CoreFoundation/CFStringEncodingDatabase.c
+  CoreFoundation/CFStringEncodings.c
   CoreFoundation/CFStringScanner.c
   CoreFoundation/CFStringUtilities.c
   CoreFoundation/CFSystemDirectories.c
@@ -115,16 +118,12 @@ set (cf_sources
   CoreFoundation/CFUnicodeDecomposition.c
   CoreFoundation/CFUnicodePrecomposition.c
   CoreFoundation/CFURL.c
+  CoreFoundation/CFURLAccess.c
   CoreFoundation/CFUtilities.c
   CoreFoundation/CFUUID.c
   CoreFoundation/CFVersion.c
   CoreFoundation/CFXMLPreferencesDomain.c
-  CoreFoundation/CFBuiltinConverters.c
-  CoreFoundation/CFSortFunctions.c
-  CoreFoundation/CFStringEncodings.c
-  CoreFoundation/CFURLAccess.c
 )
-
 
 
 set (public_headers
