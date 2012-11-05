@@ -155,7 +155,6 @@ set (public_headers
   CoreFoundation/CFURLAccess.h
   CoreFoundation/CFUUID.h
   CoreFoundation/CoreFoundation.h
-  TargetConditionals.h
 )
 
 set (private_headers
@@ -201,8 +200,8 @@ set_target_properties(cflite_shared PROPERTIES
 )
 
 install(TARGETS cflite_shared cflite_static DESTINATION lib)
-install(FILES ${public_headers} DESTINATION include)
-
+install(FILES ${public_headers} DESTINATION include/CoreFoundation)
+install(FILES TargetConditionals.h DESTINATION include)
 
 ################################################################################
 # Embedded data
