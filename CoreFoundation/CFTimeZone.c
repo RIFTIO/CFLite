@@ -954,7 +954,7 @@ CFDictionaryRef CFTimeZoneCopyAbbreviationDictionary(void) {
     return dict;
 }
 
-void _removeFromCache(const void *key, const void *value, void *context) {
+static void _removeFromCache(const void *key, const void *value, void *context) {
     CFDictionaryRemoveValue(__CFTimeZoneCache, (CFStringRef)key);
 }
 

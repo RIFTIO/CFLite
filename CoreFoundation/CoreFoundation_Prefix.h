@@ -112,7 +112,7 @@ typedef int		boolean_t;
 
 #if DEPLOYMENT_TARGET_LINUX
     
-#define __private_extern__
+#define __private_extern__  __attribute__((visibility("hidden")))
 #define __strong
 #define __weak
 
