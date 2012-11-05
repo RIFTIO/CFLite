@@ -143,7 +143,8 @@ set (public_headers
   CoreFoundation/CFLocale.h
   CoreFoundation/CFNumber.h
   CoreFoundation/CFNumberFormatter.h
-  CoreFoundation/CFPreferences.h
+  # FIXME: CFPrefs doesn't work on Linux yet
+  # CoreFoundation/CFPreferences.h
   CoreFoundation/CFPropertyList.h
   CoreFoundation/CFRunLoop.h
   CoreFoundation/CFSet.h
