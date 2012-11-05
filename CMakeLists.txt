@@ -4,7 +4,7 @@ project(CFLite)
 set (CFLiteVersion 744.12)
 set (CMAKE_VERBOSE_MAKEFILE YES)
 
-include(TestBigEndian)
+include("TestBigEndian")
 include("cmake/utilities.cmake")
 
 
@@ -45,7 +45,9 @@ set (linker_flags
   -pthread
 )
 
-set (cf_lib_names BlocksRuntime dispatch dl icudata icui18n icuuc m rt uuid)
+set (cf_lib_names
+  BlocksRuntime dispatch dl icudata icui18n icuuc m rt uuid
+)
 set (cf_lib_paths "")
 
 foreach (lib IN LISTS cf_lib_names)
@@ -164,25 +166,62 @@ set (private_headers
   CoreFoundation/ForFoundationOnly.h
 )
 
+set (embedded_resources
+  "${CMAKE_CURRENT_BINARY_DIR}/Resources/CFCharacterSetBitmaps.o"
+  "${CMAKE_CURRENT_BINARY_DIR}/Resources/CFUnicodeData.o"
+  "${CMAKE_CURRENT_BINARY_DIR}/Resources/CFUniCharPropertyDatabase.o"
+)
+
 ################################################################################
 
 add_definitions(${cflags} ${warning_flags} ${defines})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(cflite_shared SHARED ${cf_sources})
+add_library(cflite_shared SHARED ${cf_sources} ${embedded_resources})
+add_library(cflite_static STATIC ${cf_sources} ${embedded_resources})
+
+foreach (target cflite_static cflite_shared)
+  set_target_properties(${target} PROPERTIES
+    OUTPUT_NAME CoreFoundation
+  )
+endforeach ()
+
 target_link_libraries(cflite_shared ${cf_lib_paths} ${linker_flags})
 set_target_properties(cflite_shared PROPERTIES
-    OUTPUT_NAME CoreFoundation
     SOVERSION 1
     VERSION ${CFLiteVersion}
 )
 
-add_library(cflite_static STATIC ${cf_sources})
-target_link_libraries(cflite_static ${linker_flags})
-set_target_properties(cflite_static PROPERTIES
-    OUTPUT_NAME CoreFoundation
+install(TARGETS cflite_shared cflite_static DESTINATION lib)
+install(FILES ${public_headers} DESTINATION include)
+
+
+################################################################################
+# Embedded data
+################################################################################
+ConvertBinaryFileToObjectFile(
+  "Resources/CFCharacterSetBitmaps.bitmap"
+  "${CMAKE_CURRENT_BINARY_DIR}/Resources/CFCharacterSetBitmaps.o"
+  "__CFCharacterSetBitmaps"
 )
 
-install(TARGETS cflite_static cflite_shared DESTINATION lib)
-install(FILES ${public_headers} DESTINATION include)
+ConvertBinaryFileToObjectFile(
+  "Resources/CFUniCharPropertyDatabase.data"
+  "${CMAKE_CURRENT_BINARY_DIR}/Resources/CFUniCharPropertyDatabase.o"
+  "__CFUniCharPropertyDatabase"
+)
+
+test_big_endian(is_big_endian)
+if (is_big_endian)
+  set (unicode_data_file "Resources/CFUnicodeData-B.mapping")
+else ()
+  set (unicode_data_file "Resources/CFUnicodeData-L.mapping")
+endif ()
+
+ConvertBinaryFileToObjectFile(
+  "${unicode_data_file}"
+  "${CMAKE_CURRENT_BINARY_DIR}/Resources/CFUnicodeData.o"
+  "__CFUnicodeDataMapping"
+)
+
 
