@@ -74,7 +74,9 @@
 #include <CoreFoundation/CFLocale.h>
 #include <CoreFoundation/CFNumber.h>
 #include <CoreFoundation/CFNumberFormatter.h>
+#if !TARGET_OS_LINUX
 #include <CoreFoundation/CFPreferences.h>
+#endif
 #include <CoreFoundation/CFPropertyList.h>
 #include <CoreFoundation/CFRunLoop.h>
 #include <CoreFoundation/CFSet.h>
