@@ -57,7 +57,7 @@ extern void _CFGetFrameworkPath(wchar_t *path, int maxLength);
 #define __kCFCharacterSetDir "\\Windows\\CoreFoundation"
 #endif
 
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_LINUX
 #define USE_MACHO_SEGMENT 1
 #endif
 
@@ -70,6 +70,16 @@ enum {
 
 CF_INLINE uint32_t __CFUniCharMapExternalSetToInternalIndex(uint32_t cset) { return ((kCFUniCharFirstInternalSet <= cset) ? ((cset - kCFUniCharFirstInternalSet) + kCFUniCharLastExternalSet) : cset) - kCFUniCharFirstBitmapSet; }
 CF_INLINE uint32_t __CFUniCharMapCompatibilitySetID(uint32_t cset) { return ((cset == kCFUniCharControlCharacterSet) ? kCFUniCharControlAndFormatterCharacterSet : (((cset > kCFUniCharLastExternalSet) && (cset < kCFUniCharFirstInternalSet)) ? ((cset - kCFUniCharLastExternalSet) + kCFUniCharFirstInternalSet) : cset)); }
+
+#if DEPLOYMENT_TARGET_WINDOWS
+static const wchar_t *__kCFUniCharPropertyDatabaseFile;
+static const wchar_t *__kCFUniCharMappingTableFile;
+static const wchar_t *__kCFUniCharBitmapFile;
+#else
+static const char *__kCFUniCharPropertyDatabaseFile;
+static const char *__kCFUniCharMappingTableFile;
+static const char *__kCFUniCharBitmapFile;
+#endif
 
 #if (DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED) && USE_MACHO_SEGMENT
 #include <mach-o/getsect.h>
@@ -93,6 +103,45 @@ static const void *__CFGetSectDataPtr(const char *segname, const char *sectname,
     if (sizep) *sizep = 0ULL;
     return NULL;
 }
+#elif DEPLOYMENT_TARGET_LINUX && USE_MACHO_SEGMENT
+
+static const void *__CFGetSectDataPtr(const char *unused, const char *sectname, uint64_t *sizep) {
+    extern char __CFCharacterSetBitmaps_start;
+    extern char __CFCharacterSetBitmaps_end;
+    
+    extern char __CFUnicodeDataMapping_start;
+    extern char __CFUnicodeDataMapping_end;
+    
+    extern char __CFUniCharPropertyDatabase_start;
+    extern char __CFUniCharPropertyDatabase_end;
+
+    const char *begin = NULL;
+    const char *end = NULL;
+
+    if (0 == strcmp(sectname, __kCFUniCharPropertyDatabaseFile)) {
+        begin = &__CFUniCharPropertyDatabase_start;
+        end = &__CFUniCharPropertyDatabase_end;
+
+    } else if (0 == strcmp(sectname, __kCFUniCharBitmapFile)) {
+        begin = &__CFCharacterSetBitmaps_start;
+        end = &__CFCharacterSetBitmaps_end;
+
+    } else if (0 == strcmp(sectname, __kCFUniCharMappingTableFile)) {
+        begin = &__CFUnicodeDataMapping_start;
+        end = &__CFUnicodeDataMapping_end;
+    }
+
+    if (!(begin && end)) {
+        fprintf(stderr, "Could not resolve symbols.");
+        HALT;
+        if (sizep) *sizep = 0;
+        return NULL;
+    }
+
+    if (sizep) *sizep = end - begin;
+
+    return begin;
+}
 #endif
 
 #if !USE_MACHO_SEGMENT
@@ -106,9 +155,7 @@ CF_INLINE void __CFUniCharCharacterSetPath(wchar_t *wpath) {
 #else
 #error Unknown or unspecified DEPLOYMENT_TARGET
 #endif
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED
-    strlcpy(cpath, __kCFCharacterSetDir, MAXPATHLEN);
-#elif DEPLOYMENT_TARGET_LINUX
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_LINUX
     strlcpy(cpath, __kCFCharacterSetDir, MAXPATHLEN);
 #elif DEPLOYMENT_TARGET_WINDOWS
     wchar_t frameworkPath[MAXPATHLEN];
@@ -319,18 +366,20 @@ static __CFUniCharBitmapData *__CFUniCharBitmapDataArray = NULL;
 
 static CFSpinLock_t __CFUniCharBitmapLock = CFSpinLockInit;
 
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
-#if !defined(CF_UNICHAR_BITMAP_FILE)
-#if USE_MACHO_SEGMENT
-#define CF_UNICHAR_BITMAP_FILE "__csbitmaps"
+#ifdef CF_UNICHAR_BITMAP_FILE
+#if DEPLOYMENT_TARGET_WINDOWS
+static const char *__kCFUniCharBitmapFile = CF_UNICHAR_BITMAP_FILE;
 #else
-#define CF_UNICHAR_BITMAP_FILE "/CFCharacterSetBitmaps.bitmap"
+static const char_t *__kCFUniCharBitmapFile = CF_UNICHAR_BITMAP_FILE;
 #endif
+#elif DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
+#if USE_MACHO_SEGMENT
+static const char *__kCFUniCharBitmapFile = "__csbitmaps";
+#else
+static const char *__kCFUniCharBitmapFile = "/CFCharacterSetBitmaps.bitmap";
 #endif
 #elif DEPLOYMENT_TARGET_WINDOWS
-#if !defined(CF_UNICHAR_BITMAP_FILE)
-#define CF_UNICHAR_BITMAP_FILE L"CFCharacterSetBitmaps.bitmap"
-#endif
+static const wchar_t *__kCFUniCharBitmapFile = L"CFCharacterSetBitmaps.bitmap";
 #else
 #error Unknown or unspecified DEPLOYMENT_TARGET
 #endif
@@ -349,7 +398,7 @@ static bool __CFUniCharLoadBitmapData(void) {
 
     __CFSpinLock(&__CFUniCharBitmapLock);
 
-    if (__CFUniCharBitmapDataArray || !__CFUniCharLoadFile(CF_UNICHAR_BITMAP_FILE, &bytes, &fileSize) || !__CFSimpleFileSizeVerification(bytes, fileSize)) {
+    if (__CFUniCharBitmapDataArray || !__CFUniCharLoadFile(__kCFUniCharBitmapFile, &bytes, &fileSize) || !__CFSimpleFileSizeVerification(bytes, fileSize)) {
         __CFSpinUnlock(&__CFUniCharBitmapLock);
         return false;
     }
@@ -625,32 +674,20 @@ static const void **__CFUniCharMappingTables = NULL;
 static CFSpinLock_t __CFUniCharMappingTableLock = CFSpinLockInit;
 
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
-#if __CF_BIG_ENDIAN__
 #if USE_MACHO_SEGMENT
-#define MAPPING_TABLE_FILE "__data"
+static const char *__kCFUniCharMappingTableFile = "__data";
+#elif __CF_BIG_ENDIAN__
+static const char *__kCFUniCharMappingTableFile = "/CFUnicodeData-B.mapping";
 #else
-#define MAPPING_TABLE_FILE "/CFUnicodeData-B.mapping"
-#endif
-#else
-#if USE_MACHO_SEGMENT
-#define MAPPING_TABLE_FILE "__data"
-#else
-#define MAPPING_TABLE_FILE "/CFUnicodeData-L.mapping"
-#endif
+static const char *__kCFUniCharMappingTableFile = "/CFUnicodeData-L.mapping";
 #endif
 #elif DEPLOYMENT_TARGET_WINDOWS
-#if __CF_BIG_ENDIAN__
 #if USE_MACHO_SEGMENT
-#define MAPPING_TABLE_FILE "__data"
+static const wchar_t *__kCFUniCharMappingTableFile = "__data";
+#elif __CF_BIG_ENDIAN__
+static const wchar_t *__kCFUniCharMappingTableFile = L"CFUnicodeData-B.mapping";
 #else
-#define MAPPING_TABLE_FILE L"CFUnicodeData-B.mapping"
-#endif
-#else
-#if USE_MACHO_SEGMENT
-#define MAPPING_TABLE_FILE "__data"
-#else
-#define MAPPING_TABLE_FILE L"CFUnicodeData-L.mapping"
-#endif
+static const wchar_t *__kCFUniCharMappingTableFile = L"CFUnicodeData-L.mapping";
 #endif
 #else
 #error Unknown or unspecified DEPLOYMENT_TARGET
@@ -667,7 +704,7 @@ __private_extern__ const void *CFUniCharGetMappingData(uint32_t type) {
         int idx, count;
 	int64_t fileSize;
 
-        if (!__CFUniCharLoadFile(MAPPING_TABLE_FILE, &bytes, &fileSize) || !__CFSimpleFileSizeVerification(bytes, fileSize)) {
+        if (!__CFUniCharLoadFile(__kCFUniCharMappingTableFile, &bytes, &fileSize) || !__CFSimpleFileSizeVerification(bytes, fileSize)) {
             __CFSpinUnlock(&__CFUniCharMappingTableLock);
             return NULL;
         }
@@ -1151,17 +1188,23 @@ static int __CFUniCharUnicodePropertyTableCount = 0;
 
 static CFSpinLock_t __CFUniCharPropTableLock = CFSpinLockInit;
 
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
 #if USE_MACHO_SEGMENT
-#define PROP_DB_FILE "__properties"
+static const char *__kCFUniCharPropertyDatabaseFile = "__properties";
 #else
-#define PROP_DB_FILE "/CFUniCharPropertyDatabase.data"
+static const char *__kCFUniCharPropertyDatabaseFile = "/CFUniCharPropertyDatabase.data";
+#endif
+#elif DEPLOYMENT_TARGET_LINUX
+#if USE_MACHO_SEGMENT
+static const char *__kCFUniCharPropertyDatabaseFile = "__CFUniCharPropertyDatabase";
+#else
+static const char *__kCFUniCharPropertyDatabaseFile = "/CFUniCharPropertyDatabase.data";
 #endif
 #elif DEPLOYMENT_TARGET_WINDOWS
 #if USE_MACHO_SEGMENT
-#define PROP_DB_FILE "__properties"
+static const wchar_t *__kCFUniCharPropertyDatabaseFile = "__properties";
 #else
-#define PROP_DB_FILE L"CFUniCharPropertyDatabase.data"
+static const wchar_t *__kCFUniCharPropertyDatabaseFile = L"CFUniCharPropertyDatabase.data";
 #endif
 #else
 #error Unknown or unspecified DEPLOYMENT_TARGET
@@ -1182,7 +1225,7 @@ const void *CFUniCharGetUnicodePropertyDataForPlane(uint32_t propertyType, uint3
         int planeSize;
 	int64_t fileSize;
 
-        if (!__CFUniCharLoadFile(PROP_DB_FILE, &bytes, &fileSize) || !__CFSimpleFileSizeVerification(bytes, fileSize)) {
+        if (!__CFUniCharLoadFile(__kCFUniCharPropertyDatabaseFile, &bytes, &fileSize) || !__CFSimpleFileSizeVerification(bytes, fileSize)) {
             __CFSpinUnlock(&__CFUniCharPropTableLock);
             return NULL;
         }

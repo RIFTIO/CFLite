@@ -511,7 +511,7 @@ static CFURLRef _CFPreferencesURLForStandardDomainWithSafetyLevel(CFStringRef do
         CFRelease(fileName);
     }
 #else
-//#error Do not know where to store NSUserDefaults on this platform
+#warning Do not know where to store NSUserDefaults on this platform
 #endif
     return theURL;
 }

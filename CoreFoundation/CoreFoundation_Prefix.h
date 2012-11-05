@@ -112,7 +112,14 @@ typedef int		boolean_t;
 
 #if DEPLOYMENT_TARGET_LINUX
     
-#define __private_extern__
+#if !HAVE_STRLCPY
+#include "shims/strlcpy.h"
+#endif
+#if !HAVE_STRLCAT
+#include "shims/strlcat.h"
+#endif
+
+#define __private_extern__  __attribute__((visibility("hidden")))
 #define __strong
 #define __weak
 
@@ -124,9 +131,6 @@ typedef int		boolean_t;
 
 #define fprintf_l(a,locale,b,...) fprintf(a, b, __VA_ARGS__)
     
-#define strlcat(a,b,c) strncat(a,b,c)
-#define strlcpy(a,b,c) strncpy(a,b,c)
-
 #define issetugid() 0
     
 // Implemented in CFPlatform.c 
