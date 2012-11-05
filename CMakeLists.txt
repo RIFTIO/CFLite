@@ -49,7 +49,6 @@ set (cflags
 )
 
 set (linker_flags
-  "-init=___CFInitialize"
   "--no-undefined"
   -pthread
 )
