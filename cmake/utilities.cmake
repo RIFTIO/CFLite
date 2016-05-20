@@ -16,6 +16,7 @@ function (ConvertBinaryFileToObjectFile FILEPATH OBJECT_FILEPATH SYMBOL_NAME)
   get_filename_component(FILEPATH ${FILEPATH} ABSOLUTE)
   get_filename_component(parent_dir ${FILEPATH} PATH)
   get_filename_component(filename ${FILEPATH} NAME)
+  get_filename_component(object_dir ${OBJECT_FILEPATH} PATH)
 
   string(REGEX REPLACE "[^a-zA-Z_]" "_" raw_symbol "${filename}")
 
@@ -23,6 +24,7 @@ function (ConvertBinaryFileToObjectFile FILEPATH OBJECT_FILEPATH SYMBOL_NAME)
     COMMENT "Objectifying ${FILEPATH} => ${OBJECT_FILEPATH}"
      OUTPUT ${OBJECT_FILEPATH}
     DEPENDS ${FILEPATH}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${object_dir}
     COMMAND ${CMAKE_LINKER} ARGS -r -b binary -o ${OBJECT_FILEPATH} ${filename}
     COMMAND ${CMAKE_OBJCOPY}
        ARGS --rename-section .data=.rodata,alloc,load,readonly,data,contents 

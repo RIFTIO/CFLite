@@ -1147,10 +1147,14 @@ __private_extern__ uint32_t CFUniCharGetConditionalCaseMappingFlags(UTF32Char th
                 return (__CFUniCharIsAfter_i(buffer, currentIndex) ? kCFUniCharCaseMapAfter_i : 0);
             } else if (type == kCFUniCharToLowercase) {
                 if ((theChar == 0x0049) || (theChar == 0x004A) || (theChar == 0x012E)) {
-                    return (__CFUniCharIsMoreAbove(buffer + (++currentIndex), length - currentIndex) ? kCFUniCharCaseMapMoreAbove : 0);
+                    //return (__CFUniCharIsMoreAbove(buffer + (++currentIndex), length - currentIndex) ? kCFUniCharCaseMapMoreAbove : 0);
+                    ++currentIndex;
+                    return (__CFUniCharIsMoreAbove(buffer + (currentIndex), length - currentIndex) ? kCFUniCharCaseMapMoreAbove : 0);
                 }
             } else if ((theChar == 'i') || (theChar == 'j')) {
-                return (__CFUniCharIsMoreAbove(buffer + (++currentIndex), length - currentIndex) ? (kCFUniCharCaseMapAfter_i|kCFUniCharCaseMapMoreAbove) : 0);
+                //return (__CFUniCharIsMoreAbove(buffer + (++currentIndex), length - currentIndex) ? (kCFUniCharCaseMapAfter_i|kCFUniCharCaseMapMoreAbove) : 0);
+                ++currentIndex;
+                return (__CFUniCharIsMoreAbove(buffer + (currentIndex), length - currentIndex) ? (kCFUniCharCaseMapAfter_i|kCFUniCharCaseMapMoreAbove) : 0);
             }
         } else if ((*((const uint16_t *)langCode) == TURKISH_LANG_CODE) || (*((const uint16_t *)langCode) == AZERI_LANG_CODE)) {
             if (type == kCFUniCharToLowercase) {

@@ -187,7 +187,9 @@
     typedef unsigned long           UniCharCount;
     typedef unsigned char *         StringPtr;
     typedef const unsigned char *   ConstStringPtr;
+#ifndef __GI_SCANNER__
     typedef unsigned char           Str255[256];
+#endif //__GI_SCANNER__
     typedef const unsigned char *   ConstStr255Param;
     typedef SInt16                  OSErr;
     typedef SInt16                  RegionCode;

@@ -89,7 +89,16 @@ CF_EXTERN_C_BEGIN
 #include <limits.h>
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
 #include <xlocale.h>
+#ifdef RIFTWARE
+/* __block is a built in clang. This is a hack for older glibc */
+#undef __block
+#define __block __foo_block
 #include <unistd.h>
+#undef __block
+#define __block __attribute__((__blocks__(byref)))
+#else
+#include <unistd.h>
+#endif // RIFTWARE
 #include <sys/time.h>
 #include <signal.h>
 #endif
@@ -149,7 +158,7 @@ __private_extern__ CFIndex __CFActiveProcessorCount();
 	do {			\
 	    if (!(cond)) {	\
 		CFLog(prio, CFSTR(desc), a1, a2, a3, a4, a5); \
-		/* HALT; */		\
+		HALT; 	\
 	    }			\
 	} while (0)
 #else

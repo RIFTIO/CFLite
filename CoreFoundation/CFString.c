@@ -1231,7 +1231,7 @@ __private_extern__ CFStringRef __CFStringCreateImmutableFunnel3(
                         Boolean possiblyExternalFormat, Boolean tryToReduceUnicode, Boolean hasLengthByte, Boolean hasNullByte, Boolean noCopy,
                         CFAllocatorRef contentsDeallocator, UInt32 converterFlags) {
     
-    CFMutableStringRef str;
+    CFMutableStringRef str = NULL;
     CFVarWidthCharBuffer vBuf;
     CFIndex size;
     Boolean useLengthByte = false;
@@ -6123,7 +6123,7 @@ static void __CFStringAppendFormatCore(CFMutableStringRef outputString, CFString
 	case CFFormatObjectType:
 	    if (specs[curSpec].configDictIndex != -1) { // config dict
 		CFTypeRef object = NULL;
-		CFStringRef innerFormat = NULL;
+		//CFStringRef innerFormat = NULL;
 
 		switch (values[specs[curSpec].mainArgNum].type) {
 		    case CFFormatLongType:

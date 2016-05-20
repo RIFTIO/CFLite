@@ -502,6 +502,7 @@ static Boolean __validUnits(CFCalendarUnit smaller, CFCalendarUnit bigger) {
     return false;
 };
 
+#if 0
 static CFRange __CFCalendarGetRangeOfUnit1(CFCalendarRef calendar, CFCalendarUnit smallerUnit, CFCalendarUnit biggerUnit, CFAbsoluteTime at) {
     CFRange range = {kCFNotFound, kCFNotFound};
     if (!__validUnits(smallerUnit, biggerUnit)) return range;
@@ -601,6 +602,7 @@ static CFRange __CFCalendarGetRangeOfUnit1(CFCalendarRef calendar, CFCalendarUni
     }
     return range;
 }
+#endif
 
 static CFRange __CFCalendarGetRangeOfUnit2(CFCalendarRef calendar, CFCalendarUnit smallerUnit, CFCalendarUnit biggerUnit, CFAbsoluteTime at) __attribute__((noinline));
 static CFRange __CFCalendarGetRangeOfUnit2(CFCalendarRef calendar, CFCalendarUnit smallerUnit, CFCalendarUnit biggerUnit, CFAbsoluteTime at) {

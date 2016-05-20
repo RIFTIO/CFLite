@@ -167,7 +167,7 @@ CF_EXPORT void CFRunLoopObserverInvalidate(CFRunLoopObserverRef observer);
 CF_EXPORT Boolean CFRunLoopObserverIsValid(CFRunLoopObserverRef observer);
 CF_EXPORT void CFRunLoopObserverGetContext(CFRunLoopObserverRef observer, CFRunLoopObserverContext *context);
 
-typedef struct {
+typedef struct __CFRunLoopTimerContext {
     CFIndex	version;
     void *	info;
     const void *(*retain)(const void *info);

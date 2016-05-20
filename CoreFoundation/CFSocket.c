@@ -968,6 +968,20 @@ Boolean __CFSocketGetBytesAvailable(CFSocketRef s, CFIndex* ctBytesAvailable) {
 #include <CoreFoundation/CFPropertyList.h>
 #include "CFInternal.h"
 
+#ifdef RIFTWARE
+#if DEPLOYMENT_TARGET_LINUX
+#include <sys/sysctl.h>
+#include <sys/un.h>
+// #include <unistd.h>
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/ioctl.h>
+#include <sys/param.h>
+#include <dlfcn.h>
+#endif // DEPLOYMENT_TARGET_LINUX
+#endif // RIFTWARE
+
 #if DEPLOYMENT_TARGET_WINDOWS
 
 #define EINPROGRESS WSAEINPROGRESS
@@ -1005,7 +1019,7 @@ __private_extern__ int _NS_gettimeofday(struct timeval *tv, struct timezone *tz)
 
 //#define LOG_CFSOCKET
 
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
 #define INVALID_SOCKET (CFSocketNativeHandle)(-1)
 #define closesocket(a) close((a))
 #define ioctlsocket(a,b,c) ioctl((a),(b),(c))
@@ -1224,7 +1238,7 @@ CF_INLINE Boolean __CFSocketFdClr(CFSocketNativeHandle sock, CFMutableDataRef fd
 }
 
 static SInt32 __CFSocketCreateWakeupSocketPair(void) {
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
     SInt32 error;
 
     error = socketpair(PF_LOCAL, SOCK_DGRAM, 0, __CFWakeupSocketPair);
@@ -1247,7 +1261,7 @@ static SInt32 __CFSocketCreateWakeupSocketPair(void) {
         address[i].sin_family = AF_INET;
         address[i].sin_addr.s_addr = htonl(INADDR_LOOPBACK);
         if (0 <= error) error = bind(__CFWakeupSocketPair[i], (struct sockaddr *)&(address[i]), sizeof(struct sockaddr_in));
-        if (0 <= error) error = getsockname(__CFWakeupSocketPair[i], (struct sockaddr *)&(address[i]), &namelen);
+        if (0 <= error) error = getsockname(__CFWakeupSocketPair[i], (struct sockaddr *)&(address[i]), (socklen_t*)&namelen);
         if (sizeof(struct sockaddr_in) != namelen) error = -1;
     }
     if (0 <= error) error = connect(__CFWakeupSocketPair[0], (struct sockaddr *)&(address[1]), sizeof(struct sockaddr_in));
@@ -1918,7 +1932,9 @@ __attribute__ ((noreturn))	// mostly interesting for shutting up a warning
 #endif /* __GNUC__ */
 static void __CFSocketManager(void * arg)
 {
+#ifndef RIFTWARE
     pthread_setname_np("com.apple.CFSocket.private");
+#endif // RIFTWARE
     if (objc_collectingEnabled()) objc_registerThreadWithCollector();
     SInt32 nrfds, maxnrfds, fdentries = 1;
     SInt32 rfds, wfds;
@@ -2164,7 +2180,7 @@ static CFStringRef __CFSocketCopyDescription(CFTypeRef cf) {
     result = CFStringCreateMutable(CFGetAllocator(s), 0);
     __CFSocketLock(s);
     void *addr = s->_callout;
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
     Dl_info info;
     const char *name = (dladdr(addr, &info) && info.dli_saddr == addr && info.dli_sname) ? info.dli_sname : "???";
 #else
@@ -3006,7 +3022,9 @@ CFSocketError CFSocketConnectToAddress(CFSocketRef s, CFDataRef address, CFTimeI
         // You can set but not get this flag in WIN32, so assume it was in non-blocking mode.
         // The downside is that when we leave this routine we'll leave it non-blocking,
         // whether it started that way or not.
+#if defined(LOG_CFSOCKET)
         SInt32 flags = 0;
+#endif
         if (timeout > 0.0 || timeout < 0.0) ioctlsocket(sock, FIONBIO, (u_long *)&yes);
         wasBlocking = false;
 #endif
@@ -3066,7 +3084,7 @@ CFSocketRef CFSocketCreate(CFAllocatorRef allocator, SInt32 protocolFamily, SInt
         if (0 >= protocol && SOCK_STREAM == socketType) protocol = IPPROTO_TCP;
         if (0 >= protocol && SOCK_DGRAM == socketType) protocol = IPPROTO_UDP;
     }
-#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI
+#if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
     if (PF_LOCAL == protocolFamily && 0 >= socketType) socketType = SOCK_STREAM;
 #endif
 #if DEPLOYMENT_TARGET_WINDOWS

@@ -51,6 +51,7 @@ set (cflags
 set (linker_flags
   "--no-undefined"
   -pthread
+  "-Wl,--build-id"
 )
 
 set (cf_lib_names
@@ -122,8 +123,12 @@ set (cf_sources
   CoreFoundation/CFUUID.c
   CoreFoundation/CFVersion.c
   CoreFoundation/CFXMLPreferencesDomain.c
-)
 
+  # Added for RiftWare
+  CoreFoundation/CFStream.c
+  CoreFoundation/CFSocket.c
+  CoreFoundation/CFSocketStream.c
+)
 
 set (public_headers
   CoreFoundation/CFArray.h
@@ -155,6 +160,11 @@ set (public_headers
   CoreFoundation/CFURLAccess.h
   CoreFoundation/CFUUID.h
   CoreFoundation/CoreFoundation.h
+
+  # Added for RiftWare
+  CoreFoundation/CFSocket.h
+  # Added for __CFGenericValidateType_
+  CoreFoundation/CFRuntime.h
 )
 
 set (private_headers
@@ -162,7 +172,8 @@ set (private_headers
   CoreFoundation/CFError_Private.h
   CoreFoundation/CFLogUtilities.h
   CoreFoundation/CFPriv.h
-  CoreFoundation/CFRuntime.h
+  # Removed for exposing __CFGenericValidateType_
+  # CoreFoundation/CFRuntime.h
   CoreFoundation/CFStorage.h
   CoreFoundation/CFStringDefaultEncoding.h
   CoreFoundation/CFStringEncodingConverter.h
@@ -187,16 +198,20 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(cflite_shared SHARED ${cf_sources} ${embedded_resources})
 add_library(cflite_static STATIC ${cf_sources} ${embedded_resources})
 
+add_dependencies(cflite_shared cflite_static)
+
 foreach (target cflite_static cflite_shared)
   set_target_properties(${target} PROPERTIES
     OUTPUT_NAME CoreFoundation
   )
+  set_target_properties(${target} PROPERTIES COMPILE_DEFINITIONS "DEBUG")
 endforeach ()
 
 target_link_libraries(cflite_shared ${cf_lib_paths} ${linker_flags})
-set_target_properties(cflite_shared PROPERTIES
+  set_target_properties(cflite_shared PROPERTIES
     SOVERSION 1
     VERSION ${CFLiteVersion}
+  set_target_properties(${target} PROPERTIES COMPILE_DEFINITIONS "DEBUG")
 )
 
 install(TARGETS cflite_shared cflite_static DESTINATION lib)

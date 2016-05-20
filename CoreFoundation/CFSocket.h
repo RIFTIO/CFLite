@@ -149,6 +149,7 @@ enum {
 typedef void (*CFSocketCallBack)(CFSocketRef s, CFSocketCallBackType type, CFDataRef address, const void *data, void *info);
 /* If the callback wishes to keep hold of address or data after the point that it returns, then it must copy them. */
 
+#ifndef __GI_SCANNER__
 typedef struct {
     CFIndex	version;
     void *	info;
@@ -156,6 +157,7 @@ typedef struct {
     void	(*release)(const void *info);
     CFStringRef	(*copyDescription)(const void *info);
 } CFSocketContext;
+#endif //__GI_SCANNER__
 
 #if TARGET_OS_WIN32
 typedef uintptr_t CFSocketNativeHandle;

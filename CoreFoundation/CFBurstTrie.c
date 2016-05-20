@@ -1891,7 +1891,7 @@ static void serializeCFBurstTrieList(CFBurstTrieRef trie, ListNodeRef listNode, 
     }
     
     char _buffer[MAX_BUFFER_SIZE];
-    char bufferSize = (sizeof(Page) + size * (sizeof(PageEntryPacked) + MAX_STRING_SIZE));
+    int bufferSize = (sizeof(Page) + size * (sizeof(PageEntryPacked) + MAX_STRING_SIZE));
     char *buffer = bufferSize < MAX_BUFFER_SIZE ? _buffer : (char *) malloc(bufferSize);
     
     Page *page = (Page *)buffer;

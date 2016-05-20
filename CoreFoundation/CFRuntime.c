@@ -124,11 +124,30 @@ void __CFSetLastAllocationEventName(void *ptr, const char *classname) {
 
 #else
 
+#if 0
 bool __CFOASafe = false;
 
 void __CFOAInitialize(void) { }
 void __CFRecordAllocationEvent(int eventnum, void *ptr, int64_t size, uint64_t data, const char *classname) { }
 void __CFSetLastAllocationEventName(void *ptr, const char *classname) { }
+#else
+bool __CFOASafe = true;
+void (*__CFObjectAllocRecordAllocationFunction)(int, void *, int64_t , uint64_t, const char *) = NULL;
+void (*__CFObjectAllocSetLastAllocEventNameFunction)(void *, const char *) = NULL;
+
+void __CFOAInitialize(void) {
+}
+
+void __CFRecordAllocationEvent(int eventnum, void *ptr, int64_t size, uint64_t data, const char *classname) {
+    if (!__CFOASafe || !__CFObjectAllocRecordAllocationFunction) return;
+    __CFObjectAllocRecordAllocationFunction(eventnum, ptr, size, data, classname);
+}
+
+void __CFSetLastAllocationEventName(void *ptr, const char *classname) {
+    if (!__CFOASafe || !__CFObjectAllocSetLastAllocEventNameFunction) return;
+    __CFObjectAllocSetLastAllocEventNameFunction(ptr, classname);
+}
+#endif
 
 #endif
 
@@ -276,6 +295,20 @@ CF_INLINE CFOptionFlags CF_GET_COLLECTABLE_MEMORY_TYPE(const CFRuntimeClass *cls
 }
 #else
 #define CF_GET_COLLECTABLE_MEMORY_TYPE(x) (0)
+#endif
+
+#ifdef RIFTWARE
+void __CFAssignTypeToMem(CFTypeRef cf, CFTypeID typeID)
+{
+  CFRuntimeBase *memory = (CFRuntimeBase *)cf;
+  memory->_cfisa = __CFISAForTypeID(typeID);
+  memory->_rc = 1;
+  uint32_t *cfinfop = (uint32_t *)&(memory->_cfinfo);
+  uint32_t rc = 0;
+  Boolean customRC = false;
+  Boolean usesSystemDefaultAllocator = true;
+  *cfinfop = (uint32_t)((rc << 24) | (customRC ? 0x800000 : 0x0) | ((uint32_t)typeID << 8) | (usesSystemDefaultAllocator ? 0x80 : 0x00));
+}
 #endif
 
 CFTypeRef _CFRuntimeCreateInstance(CFAllocatorRef allocator, CFTypeID typeID, CFIndex extraBytes, unsigned char *category) {
@@ -523,8 +556,10 @@ CFTypeID CFTypeGetTypeID(void) {
     return __kCFTypeTypeID;
 }
 
-__private_extern__ void __CFGenericValidateType_(CFTypeRef cf, CFTypeID type, const char *func) {
+//__private_extern__ void __CFGenericValidateType_(CFTypeRef cf, CFTypeID type, const char *func) {
+void __CFGenericValidateType_(CFTypeRef cf, CFTypeID type, const char *func) {
     if (cf && CF_IS_OBJC(type, cf)) return;
+    //printf("cf=%p type=%u __CFGenericTypeID_inline=%u\n", cf, type, __CFGenericTypeID_inline(cf));
     CFAssert2((cf != NULL) && (NULL != __CFRuntimeClassTable[__CFGenericTypeID_inline(cf)]) && (__kCFNotATypeTypeID != __CFGenericTypeID_inline(cf)) && (__kCFTypeTypeID != __CFGenericTypeID_inline(cf)), __kCFLogAssertion, "%s(): pointer %p is not a CF object", func, cf); \
     CFAssert3(__CFGenericTypeID_inline(cf) == type, __kCFLogAssertion, "%s(): pointer %p is not a %s", func, cf, __CFRuntimeClassTable[type]->className);	\
 }
@@ -1617,6 +1652,11 @@ static void _CFRelease(CFTypeRef cf) {
 
 	{
 	    CFAllocatorDeallocate(allocator, (uint8_t *)cf - (usesSystemDefaultAllocator ? 0 : sizeof(CFAllocatorRef)));
+// RIFTWARE - bugfix
+            if (!usesSystemDefaultAllocator) {
+              CFAllocatorRef realAllocator = _CFConvertAllocatorToNonGCRefZeroEquivalent(allocator);
+	      CFRelease(realAllocator);
+            }
 	}
 
 	if (kCFAllocatorSystemDefault != allocator) {

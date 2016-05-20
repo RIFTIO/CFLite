@@ -267,6 +267,10 @@ typedef struct __CFRuntimeBase {
 #define INIT_CFRUNTIME_BASE(...) {0, {0x80, 0, 0, 0}}
 #endif
 
+#ifdef RIFTWARE
+CF_EXPORT void __CFAssignTypeToMem(CFTypeRef cf, CFTypeID typeID);
+#endif
+
 CF_EXPORT CFTypeRef _CFRuntimeCreateInstance(CFAllocatorRef allocator, CFTypeID typeID, CFIndex extraBytes, unsigned char *category);
 	/* Creates a new CF instance of the class specified by the
 	 * given CFTypeID, using the given allocator, and returns it. 

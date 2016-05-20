@@ -38,6 +38,11 @@ typedef CFTimeInterval CFAbsoluteTime;
 /* absolute time is the time interval since the reference date */
 /* the reference date (epoch) is 00:00:00 1 January 2001. */
 
+/**
+ * CFAbsoluteTimeGetCurrent:
+ *
+ * Returns: (transfer none)
+ */
 CF_EXPORT
 CFAbsoluteTime CFAbsoluteTimeGetCurrent(void);
 
