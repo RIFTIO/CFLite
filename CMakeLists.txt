@@ -7,6 +7,7 @@ set (CMAKE_VERBOSE_MAKEFILE YES)
 include("TestBigEndian")
 include("CheckFunctionExists")
 include("cmake/utilities.cmake")
+include("GNUInstallDirs")
 
 check_function_exists("strncat" "string.h" HAVE_STRLCAT)
 if (HAVE_STRLCAT)
@@ -214,9 +215,9 @@ target_link_libraries(cflite_shared ${cf_lib_paths} ${linker_flags})
   set_target_properties(${target} PROPERTIES COMPILE_DEFINITIONS "DEBUG")
 )
 
-install(TARGETS cflite_shared cflite_static DESTINATION lib)
-install(FILES ${public_headers} DESTINATION include/CoreFoundation)
-install(FILES TargetConditionals.h DESTINATION include)
+install(TARGETS cflite_shared cflite_static DESTINATION ${CMAKE_INSTALL_LIBDIR})
+install(FILES ${public_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/CoreFoundation)
+install(FILES TargetConditionals.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 ################################################################################
 # Embedded data
