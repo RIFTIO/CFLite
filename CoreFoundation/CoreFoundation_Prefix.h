@@ -156,7 +156,7 @@ CF_INLINE size_t malloc_size(void *memblock) {
     return malloc_usable_size(memblock);
 }
 
-#include <time.h>
+#include </usr/include/time.h>
 CF_INLINE uint64_t mach_absolute_time() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);

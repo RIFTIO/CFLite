@@ -88,7 +88,7 @@ CF_EXTERN_C_BEGIN
 #include <CoreFoundation/CFRuntime.h>
 #include <limits.h>
 #if DEPLOYMENT_TARGET_MACOSX || DEPLOYMENT_TARGET_EMBEDDED || DEPLOYMENT_TARGET_EMBEDDED_MINI || DEPLOYMENT_TARGET_LINUX
-#include <xlocale.h>
+//#include <xlocale.h>
 #ifdef RIFTWARE
 /* __block is a built in clang. This is a hack for older glibc */
 #undef __block

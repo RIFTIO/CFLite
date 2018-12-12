@@ -42,7 +42,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
-#include <xlocale.h>
+// #include <xlocale.h>
 #include <CoreFoundation/CFStringDefaultEncoding.h>
 #endif
 

@@ -38,7 +38,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
-#include <xlocale.h>
+// #include <xlocale.h>
 
 CF_EXTERN_C_BEGIN
 
