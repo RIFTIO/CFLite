@@ -41,7 +41,7 @@ typedef CFTimeInterval CFAbsoluteTime;
 /**
  * CFAbsoluteTimeGetCurrent:
  *
- * Returns: (transfer none)
+ * Returns: (skip)
  */
 CF_EXPORT
 CFAbsoluteTime CFAbsoluteTimeGetCurrent(void);
