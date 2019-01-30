@@ -34,15 +34,10 @@ CF_IMPLICIT_BRIDGING_ENABLED
 CF_EXTERN_C_BEGIN
 
 typedef double CFTimeInterval;
-typedef CFTimeInterval CFAbsoluteTime;
+typedef double CFAbsoluteTime;
 /* absolute time is the time interval since the reference date */
 /* the reference date (epoch) is 00:00:00 1 January 2001. */
 
-/**
- * CFAbsoluteTimeGetCurrent:
- *
- * Returns: (skip)
- */
 CF_EXPORT
 CFAbsoluteTime CFAbsoluteTimeGetCurrent(void);
 
